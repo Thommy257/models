@@ -75,7 +75,7 @@ def get_spatial_image_size(image_resizer_config):
   raise ValueError("Unknown image resizer type.")
 
 
-def get_configs_from_pipeline_file(pipeline_config_path):
+def get_configs_from_pipeline_file(pipeline_config_path, num_classes_config_path =""):
   """Reads config from a file containing pipeline_pb2.TrainEvalPipelineConfig.
 
   Args:
@@ -91,10 +91,10 @@ def get_configs_from_pipeline_file(pipeline_config_path):
   with tf.gfile.GFile(pipeline_config_path, "r") as f:
     proto_str = f.read()
     text_format.Merge(proto_str, pipeline_config)
-  return create_configs_from_pipeline_proto(pipeline_config)
+  return create_configs_from_pipeline_proto(pipeline_config, num_classes_config_path)
 
 
-def create_configs_from_pipeline_proto(pipeline_config):
+def create_configs_from_pipeline_proto(pipeline_config, num_classes_config_path):
   """Creates a configs dictionary from pipeline_pb2.TrainEvalPipelineConfig.
 
   Args:
@@ -111,6 +111,14 @@ def create_configs_from_pipeline_proto(pipeline_config):
   configs["train_input_config"] = pipeline_config.train_input_reader
   configs["eval_config"] = pipeline_config.eval_config
   configs["eval_input_config"] = pipeline_config.eval_input_reader
+  
+  try:
+    with open(num_classes_config_path, "r") as f:
+      num_class = int(f.readline())
+      configs["num_classes"] = num_class
+  except:
+    raise ValueError('--num_classes_config_path must be given')
+
   return configs
 
 
@@ -157,7 +165,8 @@ def get_configs_from_multiple_files(model_config_path="",
                                     train_config_path="",
                                     train_input_config_path="",
                                     eval_config_path="",
-                                    eval_input_config_path=""):
+                                    eval_input_config_path="",
+                                    num_classes_config_path=""):
   """Reads training configuration from multiple config files.
 
   Args:
@@ -202,6 +211,11 @@ def get_configs_from_multiple_files(model_config_path="",
     with tf.gfile.GFile(eval_input_config_path, "r") as f:
       text_format.Merge(f.read(), eval_input_config)
       configs["eval_input_config"] = eval_input_config
+
+  if num_classes_config_path:
+    with open(num_classes_config_path, "r") as f:
+      num_class = int(f.readline())
+      configs["num_classes"] = model_config
 
   return configs
 

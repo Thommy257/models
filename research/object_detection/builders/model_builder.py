@@ -71,7 +71,7 @@ FASTER_RCNN_FEATURE_EXTRACTOR_CLASS_MAP = {
 }
 
 
-def build(model_config, is_training, add_summaries=True,
+def build(model_config, num_classes, is_training, add_summaries=True,
           add_background_class=True):
   """Builds a DetectionModel based on the model config.
 
@@ -94,10 +94,10 @@ def build(model_config, is_training, add_summaries=True,
     raise ValueError('model_config not of type model_pb2.DetectionModel.')
   meta_architecture = model_config.WhichOneof('model')
   if meta_architecture == 'ssd':
-    return _build_ssd_model(model_config.ssd, is_training, add_summaries,
+    return _build_ssd_model(model_config.ssd, num_classes, is_training, add_summaries,
                             add_background_class)
   if meta_architecture == 'faster_rcnn':
-    return _build_faster_rcnn_model(model_config.faster_rcnn, is_training,
+    return _build_faster_rcnn_model(model_config.faster_rcnn, num_classes, is_training,
                                     add_summaries)
   raise ValueError('Unknown meta architecture: {}'.format(meta_architecture))
 
@@ -138,7 +138,7 @@ def _build_ssd_feature_extractor(feature_extractor_config, is_training,
       override_base_feature_extractor_hyperparams)
 
 
-def _build_ssd_model(ssd_config, is_training, add_summaries,
+def _build_ssd_model(ssd_config, num_classes, is_training, add_summaries,
                      add_background_class=True):
   """Builds an SSD detection model based on the model config.
 
@@ -158,7 +158,7 @@ def _build_ssd_model(ssd_config, is_training, add_summaries,
     ValueError: If ssd_config.type is not recognized (i.e. not registered in
       model_class_map).
   """
-  num_classes = ssd_config.num_classes
+  #num_classes = ssd_config.num_classes
 
   # Feature extractor
   feature_extractor = _build_ssd_feature_extractor(
@@ -250,7 +250,7 @@ def _build_faster_rcnn_feature_extractor(
       batch_norm_trainable, reuse_weights)
 
 
-def _build_faster_rcnn_model(frcnn_config, is_training, add_summaries):
+def _build_faster_rcnn_model(frcnn_config, num_classes, is_training, add_summaries):
   """Builds a Faster R-CNN or R-FCN detection model based on the model config.
 
   Builds R-FCN model if the second_stage_box_predictor in the config is of type
@@ -269,7 +269,7 @@ def _build_faster_rcnn_model(frcnn_config, is_training, add_summaries):
     ValueError: If frcnn_config.type is not recognized (i.e. not registered in
       model_class_map).
   """
-  num_classes = frcnn_config.num_classes
+  #num_classes = frcnn_config.num_classes
   image_resizer_fn = image_resizer_builder.build(frcnn_config.image_resizer)
 
   feature_extractor = _build_faster_rcnn_feature_extractor(

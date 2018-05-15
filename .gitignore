@@ -8,6 +8,10 @@ __pycache__/
 
 # Distribution / packaging
 .Python
+research/pycocotools/
+research/object_detection/protos/
+research/object_detection/nets/
+research/object_detection/training/
 env/
 build/
 develop-eggs/
